@@ -96,6 +96,9 @@ static int rose_send_frame(struct sk_buff *skb, struct rose_neigh *neigh)
 {
 	ax25_address *rose_call;
 	ax25_cb *ax25s;
+	
+	if (!neigh->dev)
+		return -ENODEV;
 
 	if (ax25cmp(&rose_callsign, &null_ax25_address) == 0)
 		rose_call = (ax25_address *)neigh->dev->dev_addr;
