@@ -63,6 +63,7 @@ config PARISC
 	select HAVE_FTRACE_MCOUNT_RECORD if HAVE_DYNAMIC_FTRACE
 	select HAVE_KPROBES_ON_FTRACE
 	select HAVE_DYNAMIC_FTRACE_WITH_REGS
+	select SET_FS
 
 	help
 	  The PA-RISC microprocessor is designed by Hewlett-Packard and used
@@ -195,7 +196,6 @@ config PA11
 	depends on PA7000 || PA7100LC || PA7200 || PA7300LC
 	select ARCH_HAS_SYNC_DMA_FOR_CPU
 	select ARCH_HAS_SYNC_DMA_FOR_DEVICE
-	select DMA_NONCOHERENT_CACHE_SYNC
 
 config PREFETCH
 	def_bool y
@@ -376,5 +376,6 @@ config KEXEC_FILE
 
 endmenu
 
+source "drivers/firmware/Kconfig"
 
 source "drivers/parisc/Kconfig"

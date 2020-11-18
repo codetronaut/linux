@@ -1,8 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0-only
 /*
  * QLogic Fibre Channel HBA Driver
  * Copyright (c)  2003-2017 QLogic Corporation
- *
- * See LICENSE.qla2xxx for copyright and licensing details.
  */
 #include "qla_nvme.h"
 #include <linux/scatterlist.h>
@@ -542,7 +541,7 @@ static int qla_nvme_post_cmd(struct nvme_fc_local_port *lport,
 	fc_port_t *fcport;
 	struct srb_iocb *nvme;
 	struct scsi_qla_host *vha;
-	int rval = -ENODEV;
+	int rval;
 	srb_t *sp;
 	struct qla_qpair *qpair = hw_queue_handle;
 	struct nvme_private *priv = fd->private;
@@ -550,19 +549,21 @@ static int qla_nvme_post_cmd(struct nvme_fc_local_port *lport,
 
 	if (!priv) {
 		/* nvme association has been torn down */
-		return rval;
+		return -ENODEV;
 	}
 
 	fcport = qla_rport->fcport;
 
-	if (!qpair || !fcport || (qpair && !qpair->fw_started) ||
-	    (fcport && fcport->deleted))
-		return rval;
+	if (!qpair || !fcport)
+		return -ENODEV;
+
+	if (!qpair->fw_started || fcport->deleted)
+		return -EBUSY;
 
 	vha = fcport->vha;
 
 	if (!(fcport->nvme_flag & NVME_FLAG_REGISTERED))
-		return rval;
+		return -ENODEV;
 
 	if (test_bit(ABORT_ISP_ACTIVE, &vha->dpc_flags) ||
 	    (qpair && !qpair->fw_started) || fcport->deleted)
